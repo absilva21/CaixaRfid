@@ -1,5 +1,8 @@
 package server;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 
 public class HttpLayer extends Thread {
@@ -9,6 +12,32 @@ public class HttpLayer extends Thread {
 
 	@Override
 	public void run() {
+		
+		String resText = "HTTP/1.1 200 OK\n\r\n";
+		ObjectOutputStream oos = null;
+		try {
+			oos = new ObjectOutputStream(socket.getOutputStream());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			oos.writeUTF(resText);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			
+			socket.close();
+			System.out.println("Resposta enviada com sucesso");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	
 		
 	}
 	
@@ -21,7 +50,7 @@ public class HttpLayer extends Thread {
 	
 	public String[] mensageProcess(String men) {
 		String[] reqSeparada = null;
-		
+	    reqSeparada = req.split(" "); 
 		return reqSeparada;
 	}
 	public HttpLayer(Runnable target) {

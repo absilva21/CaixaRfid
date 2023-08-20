@@ -1,52 +1,64 @@
 package server;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class Server {
 	
 	static ServerSocket server;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		// TODO Auto-generated method stub
+		//Ligando o servidor
 		server = new ServerSocket(80);
 		System.out.println("servidor ligado");
 		while(true) {
+			//entrado na  escuta
 			System.out.println("aguardando mensagem");
 			Socket socket = server.accept();
-			
-			
+			//lendo a mensagem
 			
 			InputStream inputStream = socket.getInputStream(); 
-			StringBuilder textBuilder = new StringBuilder();
-			try (Reader reader = new BufferedReader(new InputStreamReader
-				      (inputStream, StandardCharsets.UTF_8))) {
-				        int c = 0;
-				        while ((c = reader.read()) != -1) {
-				            textBuilder.append((char) c);
-				        }
-			}
 			
-			System.out.println("aqui está a requisição\n");
 			
-			String req  = textBuilder.toString();
+			//consumindo com segurança
+					
+			BufferedReader entrada =new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String menssage = "";
+			String req = "";
+			while((menssage = entrada.readLine())!=null){
+				 	if(menssage.equals("")) {
+				 		break;
+				 	}
+	                req += "\n"+menssage;
+	                System.out.println( menssage);
+	         }
 			
-			String[] reqSeparada = req.split(" "); 
+			//enviando para a camada de aplicação
+		
+			System.out.println("enviando para a camada de aplicação");
+			
+			HttpLayer http = new HttpLayer(req,socket);
+			http.run();
+		
+			
+			/*String[] reqSeparada = req.split(" "); 
 			for(int i = 0;i<reqSeparada.length;i++) {
 				System.out.println(reqSeparada[i]);
-			}
+			}*/
 			
 			//System.out.println(textBuilder.toString());
 		
-	         socket.close();
-			 System.out.println("conexão encerrada");
+	        
 		}
 		
 	}
