@@ -1,9 +1,10 @@
 package server;
 
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
+import java.io.PrintStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class HttpLayer extends Thread {
 	
@@ -13,25 +14,37 @@ public class HttpLayer extends Thread {
 	@Override
 	public void run() {
 		
-		String resText = "HTTP/1.1 200 OK\n\r\n";
-		ObjectOutputStream oos = null;
+		String[] reqS = req.split("\r\n");
+		
+		for(int i = 0;i<reqS.length;i++) {
+			System.out.println(reqS[i]);
+		}
+		
+		
+		String resTextAscii = "HTTP/1.1 200 OK\r\n"
+				+ "Content-Type: application/json; charset=utf-8\r\n"
+				+"Content-Length: 29 \r\n"
+				+ "\r\n"
+				+"{\"resposta\":\"deu tudo certo\"}";
+		byte[] bytes = resTextAscii.getBytes(StandardCharsets.UTF_8);
+		String resTextUTF = new String(bytes,StandardCharsets.UTF_8);
+		
 		try {
-			oos = new ObjectOutputStream(socket.getOutputStream());
+			
+			PrintStream response = new PrintStream(socket.getOutputStream());
+			response.print(resTextUTF);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		try {
-			oos.writeUTF(resText);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		
+		
 		
 		try {
 			
 			socket.close();
-			System.out.println("Resposta enviada com sucesso");
+			System.out.println("\nResposta enviada com sucesso\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -48,11 +61,7 @@ public class HttpLayer extends Thread {
 	}
 
 	
-	public String[] mensageProcess(String men) {
-		String[] reqSeparada = null;
-	    reqSeparada = req.split(" "); 
-		return reqSeparada;
-	}
+
 	public HttpLayer(Runnable target) {
 		super(target);
 		// TODO Auto-generated constructor stub
