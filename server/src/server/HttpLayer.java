@@ -36,7 +36,7 @@ public class HttpLayer extends Thread {
 					+ "\r\n"
 					+"<html>\n"
 					+ "<body>\n"
-					+ "<h1>erro 404 o recuso não pode ser encontrado</h1>\n"
+					+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
 					+ "</body>\n"
 					+ "</html>"; 
 		}

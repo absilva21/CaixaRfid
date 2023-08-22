@@ -25,12 +25,12 @@ public class Server {
 
 			//lendo a mensagem	
 			
-			//consumindo com segurança
+			//consumindo com seguranï¿½a
 			
 			BufferedReader   entrada = new BufferedReader (new InputStreamReader (socket.getInputStream()));
 			
 		  
-		    System.out.println("zona crítica\n");
+		    System.out.println("zona crÃ­tica\n");
 		    String req = "";
 		   
 			char[] buf = new char[8388608];
@@ -42,11 +42,11 @@ public class Server {
 				n++;
 			}
 			
-			System.out.println("a requisição "+req+"\n");
+			System.out.println("a requisiÃ§Ã£o "+req+"\n");
 						
-			//enviando para a camada de aplicação
+			//enviando para a camada de aplicaï¿½ï¿½o
 		
-			System.out.println("enviando para a camada de aplicação\n");
+			System.out.println("enviando para a camada de aplicaÃ§Ã£o\n");
 			
 			HttpLayer http = new HttpLayer(req,socket);
 			http.run();
