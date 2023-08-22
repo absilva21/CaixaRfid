@@ -6,6 +6,8 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+//representa a camada http
+
 public class HttpLayer extends Thread {
 	
 	private String req;
@@ -15,17 +17,30 @@ public class HttpLayer extends Thread {
 	public void run() {
 		
 		String[] reqS = req.split("\r\n");
+		String resTextAscii = "";
 		
 		for(int i = 0;i<reqS.length;i++) {
 			System.out.println(reqS[i]);
 		}
 		
-		
-		String resTextAscii = "HTTP/1.1 200 OK\r\n"
-				+ "Content-Type: application/json; charset=utf-8\r\n"
-				+"Content-Length: 29 \r\n"
-				+ "\r\n"
-				+"{\"resposta\":\"deu tudo certo\"}";
+		if(reqS[0].startsWith("GET")) {
+			resTextAscii = "HTTP/1.1 200 OK\r\n"
+					+ "Content-Type: application/json; charset=utf-8\r\n"
+					+"Content-Length: 29 \r\n"
+					+ "\r\n"
+					+"{\"resposta\":\"deu tudo certo\"}"; 
+		}else {
+			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
+					+ "Content-Type: text/html; charset=UTF-8\r\n"
+					+"Content-Length: 60 \r\n"
+					+ "\r\n"
+					+"<html>\n"
+					+ "<body>\n"
+					+ "<h1>erro 404 o recuso não pode ser encontrado</h1>\n"
+					+ "</body>\n"
+					+ "</html>"; 
+		}
+		 
 		byte[] bytes = resTextAscii.getBytes(StandardCharsets.UTF_8);
 		String resTextUTF = new String(bytes,StandardCharsets.UTF_8);
 		

@@ -1,19 +1,13 @@
 package server;
 
-import java.io.BufferedInputStream;
+
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+
+//representa a camada de transporte
 
 public class Server {
 	
