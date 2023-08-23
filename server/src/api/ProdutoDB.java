@@ -1,7 +1,11 @@
 package api;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 //representa a classe que vai carregar ou persistir os dados
-public class ProdutoDB {
+public class ProdutoDB implements IPersistente{
 	
 
 	//represente o objeto que será salvo ou carregado
@@ -12,13 +16,23 @@ public class ProdutoDB {
 		this.produto = p;
 	}
 	
-	public boolean load(){
-		File csvDB = new File("pro")
-		return false;
+	//retorna 1 se tiver concluido o se der erro -1 se o arquivo estiver aberto
+	public int load(){
+		int result = 0;
+		File csvDB = new File("produto.csv");
+		try {
+			Scanner csvLeitor = new Scanner(csvDB);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 	
-	public boolean save() {
-		return false;
+	public int save() {
+		int result = 0;
+		return result;
 	}
 
 	public Produto getProduto() {
