@@ -4,7 +4,7 @@ package api;
 public class ProdutoDB {
 	
 
-	
+	//represente o objeto que será salvo ou carregado
 	private Produto produto;
 
 	public ProdutoDB(Produto p) {
@@ -13,7 +13,7 @@ public class ProdutoDB {
 	}
 	
 	public boolean load(){
-		
+		File csvDB = new File("pro")
 		return false;
 	}
 	
