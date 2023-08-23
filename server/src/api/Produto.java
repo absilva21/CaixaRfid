@@ -4,6 +4,15 @@ public class Produto implements IPersistente{
 	private String codigo;
 	private String descricao;
 	private double valor;
+	private double estoque;
+	public double getEstoque() {
+		return estoque;
+	}
+
+	public void setEstoque(double estoque) {
+		this.estoque = estoque;
+	}
+
 	private ProdutoDB db;
 	
 	// representa a maniulção dos dados do produto
@@ -11,26 +20,26 @@ public class Produto implements IPersistente{
 	public Produto(String cd){
 		this.codigo = cd;
 		this.descricao = "";
-		this.codigo = "";
 		this.valor = 0.0;
-		
+		this.db = new ProdutoDB(this);
 		
 	}
 	
-	public Produto(String cd,String desc,double vl ) {
+	public Produto(String cd,String desc,double vl, double es ) {
 		// TODO Auto-generated constructor stub
 		this.codigo = cd;
 		this.descricao = desc;
 		this.valor = vl;
+		this.estoque = es;
 		this.db = new ProdutoDB(this);
 	}
 	
 	public int load() {
-		return db.load();
+		return this.db.load();
 	}
 	
-	public int save() {
-		return db.save();
+	public int save(boolean isUpdate) {
+		return this.db.save( isUpdate);
 		
 	}
 

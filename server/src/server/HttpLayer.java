@@ -6,6 +6,8 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import api.Produto;
+
 //representa a camada http
 
 public class HttpLayer extends Thread {
@@ -19,17 +21,32 @@ public class HttpLayer extends Thread {
 		String[] reqS = req.split("\r\n");
 		String resTextAscii = "";
 		
-		for(int i = 0;i<reqS.length;i++) {
-			System.out.println(reqS[i]);
-		}
 		
 		if(reqS[0].startsWith("GET")) {
-			resTextAscii = "HTTP/1.1 200 OK\r\n"
-					+ "Content-Type: application/json; charset=utf-8\r\n"
-					+"Content-Length: 29 \r\n"
-					+ "\r\n"
-					+"{\"resposta\":\"deu tudo certo\"}"; 
+			Produto p = new Produto("123");
+			
+			if(p.load()==1) {
+				
+				String body ="{\"codigo\":\""+p.getCodigo()+"\","
+				+"\"descricao\":\""+p.getDescricao()+"\","
+				+"\"valor\":\""+p.getValor()+"\","
+				+"\"estoque\":\""+p.getEstoque()+"\"}";
+				resTextAscii = "HTTP/1.1 200 OK\r\n"
+						+ "Content-Type: application/json; charset=utf-8\r\n"
+						+"Content-Length:"+ body.length() +"\r\n"
+						+ "\r\n"
+						+body;
+			}else {
+			
+				resTextAscii = "HTTP/1.1 200 OK\r\n"
+						+ "Content-Type: application/json; charset=utf-8\r\n"
+						+"Content-Length: 16 \r\n"
+						+ "\r\n"
+						+"{\"mensagem\":\"ok\"}";
+			}
+			
 		}else {
+			
 			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
 					+ "Content-Type: text/html; charset=UTF-8\r\n"
 					+"Content-Length: 60 \r\n"
