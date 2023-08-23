@@ -44,7 +44,7 @@ public class Server {
 			
 			System.out.println("a requisição "+req+"\n");
 						
-			//enviando para a camada de aplica��o
+			//enviando para a camada de aplicação
 		
 			System.out.println("enviando para a camada de aplicação\n");
 			
@@ -52,12 +52,7 @@ public class Server {
 			http.run();
 		
 			
-			/*String[] reqSeparada = req.split(" "); 
-			for(int i = 0;i<reqSeparada.length;i++) {
-				System.out.println(reqSeparada[i]);
-			}*/
-			
-			//System.out.println(textBuilder.toString());
+		
 		
 	        
 		}
