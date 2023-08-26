@@ -1,10 +1,17 @@
 package application;
 
-import java.io.IOException; 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
-
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 
 
 public class Caixa extends Application {
@@ -25,7 +32,41 @@ public class Caixa extends Application {
 	}
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
-		launch(args);
+		//launch(args);
+		Socket leitor = new Socket("192.168.0.111",70);
+		
+		
+		System.out.println("aguardando leitura dos produtos...\n");
+			
+		BufferedWriter bufferOut = new BufferedWriter(new OutputStreamWriter(leitor.getOutputStream()));
+		bufferOut.write( "read");
+		bufferOut.flush();
+		
+		BufferedReader bufferIn = new BufferedReader(new InputStreamReader(leitor.getInputStream()));
+		
+	
+		
+		String req = "";
+		
+		char[] buf = new char[8388608];
+		bufferIn.read(buf);
+		
+		int n = 0;
+		
+		while(buf[n]!=0) {
+			req += buf[n];
+			n++;
+		}
+		bufferOut.close();
+		bufferIn.close();
+		
+		leitor.close();
+		System.out.println("produtos:\n");
+		System.out.println(req);
+		
+
+		
+		System.exit(0);
 
 	}
 }

@@ -19,34 +19,49 @@ public class HttpLayer extends Thread {
 	public void run() {
 		
 		String[] reqS = req.split("\r\n");
+		String[] auxRota = reqS[0].split(" ");
 		String resTextAscii = "";
-		
-		
-		if(reqS[0].startsWith("GET")) {
-			Produto p = new Produto("123");
-			
-			if(p.load()==1) {
+		String[] rota = auxRota[1].split("\\?"); //meta caracter "?" o certo é \\? 
+		String[] params = rota[1].split("&");
+		System.out.println("aqui está a rota:"+rota[0]+"\n");
+		if(rota[0].equals("/produto")) {
+			if(reqS[0].startsWith("GET")) {
 				
-				String body ="{\"codigo\":\""+p.getCodigo()+"\","
-				+"\"descricao\":\""+p.getDescricao()+"\","
-				+"\"valor\":\""+p.getValor()+"\","
-				+"\"estoque\":\""+p.getEstoque()+"\"}";
-				resTextAscii = "HTTP/1.1 200 OK\r\n"
-						+ "Content-Type: application/json; charset=utf-8\r\n"
-						+"Content-Length:"+ body.length() +"\r\n"
-						+ "\r\n"
-						+body;
+				Produto p = new Produto(params[0].substring(params[0].indexOf('=')));
+				
+				if(p.load()==1) {
+					
+					String body ="{\"codigo\":\""+p.getCodigo()+"\","
+					+"\"descricao\":\""+p.getDescricao()+"\","
+					+"\"valor\":\""+p.getValor()+"\","
+					+"\"estoque\":\""+p.getEstoque()+"\"}";
+					resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: application/json; charset=utf-8\r\n"
+							+"Content-Length:"+ body.length() +"\r\n"
+							+ "\r\n"
+							+body;
+				}else {
+				
+					resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: application/json; charset=utf-8\r\n"
+							+"Content-Length: 16 \r\n"
+							+ "\r\n"
+							+"{\"mensagem\":\"ok\"}";
+				}
+				
 			}else {
-			
-				resTextAscii = "HTTP/1.1 200 OK\r\n"
-						+ "Content-Type: application/json; charset=utf-8\r\n"
-						+"Content-Length: 16 \r\n"
+				
+				resTextAscii = "HTTP/1.1 404 Not Found\r\n"
+						+ "Content-Type: text/html; charset=UTF-8\r\n"
+						+"Content-Length: 60 \r\n"
 						+ "\r\n"
-						+"{\"mensagem\":\"ok\"}";
+						+"<html>\n"
+						+ "<body>\n"
+						+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
+						+ "</body>\n"
+						+ "</html>"; 
 			}
-			
 		}else {
-			
 			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
 					+ "Content-Type: text/html; charset=UTF-8\r\n"
 					+"Content-Length: 60 \r\n"
@@ -57,6 +72,7 @@ public class HttpLayer extends Thread {
 					+ "</body>\n"
 					+ "</html>"; 
 		}
+		
 		 
 		byte[] bytes = resTextAscii.getBytes(StandardCharsets.UTF_8);
 		String resTextUTF = new String(bytes,StandardCharsets.UTF_8);
