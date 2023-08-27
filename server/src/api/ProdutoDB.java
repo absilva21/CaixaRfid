@@ -3,6 +3,7 @@ package api;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.sql.*;
 
 //representa a classe que vai carregar ou persistir os dados
 public class ProdutoDB implements IPersistente{
@@ -19,41 +20,29 @@ public class ProdutoDB implements IPersistente{
 	//retorna 1 se tiver concluido, 0 se não encontrar a linha, -1 se der erro
 	public int load(){
 		int result = 0;
-		
-		File csvDB = new File(System.getProperty("user.dir")+"\\src\\produto.csv");
-		try {
-			String linha = ""; 
-			String pdtStr = "";
-			Scanner csvLeitor = new Scanner(csvDB);
-			while(csvLeitor.hasNext()) {
-				System.out.println(linha);
-				if(linha.startsWith(this.produto.getCodigo())){
-					
-					break;
-				}else {
-					linha = csvLeitor.nextLine();
-				}
-				
-			}
-			pdtStr = linha;
-			csvLeitor.close();
-			
-			String[] objP = pdtStr.split(";");
-			if(objP.length==1) {
-				result = 0;
-			}else {
-				 this.produto.setCodigo(objP[0]);
-				 this.produto.setDescricao(objP[1]);
-				 this.produto.setValor(Double.parseDouble(objP[2]));
-				 this.produto.setEstoque(Double.parseDouble(objP[3]));
-			     result = 1;
-			}
-		   
-		} catch (FileNotFoundException e) {
+		 try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		  try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+			  System.out.println("Conexão realizada !!!!");
+			  Statement statement = connection.createStatement();
+			  
+			  ResultSet rs =  statement.executeQuery("Select * FROM produto p WHERE p.codigo =  " + "\""+produto.getCodigo()+"\"");
+              if(rs.next()) {
+            	  produto.setDescricao(rs.getString(2));
+            	  produto.setValor(rs.getDouble(3));
+            	  produto.setEstoque(rs.getDouble(4));
+            	  result = 1;
+              }
+            	  
+		  } catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			result = -1;
 		}
+		
 		return result;
 	}
 	//se isUpadate for verdadeiro ele salva o registro na mesma linha

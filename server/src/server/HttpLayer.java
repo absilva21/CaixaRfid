@@ -96,7 +96,7 @@ public class HttpLayer extends Thread {
 					+"\"estoque\":\""+p.getEstoque()+"\"}";
 					resTextAscii = "HTTP/1.1 200 OK\r\n"
 							+ "Content-Type: application/json; charset=utf-8\r\n"
-							+"Content-Length:"+ body.length() +"\r\n"
+							+"Content-Length:"+ body.getBytes().length +"\r\n"
 							+ "\r\n"
 							+body;
 				}else {
