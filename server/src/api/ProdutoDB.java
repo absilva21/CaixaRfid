@@ -37,13 +37,18 @@ public class ProdutoDB implements IPersistente{
 			}
 			pdtStr = linha;
 			csvLeitor.close();
+			
 			String[] objP = pdtStr.split(";");
-		
-		    this.produto.setCodigo(objP[0]);
-		    this.produto.setDescricao(objP[1]);
-		    this.produto.setValor(Double.parseDouble(objP[2]));
-		    this.produto.setEstoque(Double.parseDouble(objP[3]));
-			result = 1;
+			if(objP.length==1) {
+				result = 0;
+			}else {
+				 this.produto.setCodigo(objP[0]);
+				 this.produto.setDescricao(objP[1]);
+				 this.produto.setValor(Double.parseDouble(objP[2]));
+				 this.produto.setEstoque(Double.parseDouble(objP[3]));
+			     result = 1;
+			}
+		   
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

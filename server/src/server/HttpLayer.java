@@ -17,50 +17,21 @@ public class HttpLayer extends Thread {
 
 	@Override
 	public void run() {
-		
+		//dividindo a requisição em linhas
 		String[] reqS = req.split("\r\n");
+		//separando a primeira linha
 		String[] auxRota = reqS[0].split(" ");
+		// armazena a resposta a ser retornada
 		String resTextAscii = "";
-		String[] rota = auxRota[1].split("\\?"); //meta caracter "?" o certo é \\? 
+		//resgata a rota
+		String[] rota = auxRota[1].split("\\?"); 
+		//resgata os parametros
 		String[] params = rota[1].split("&");
-		System.out.println("aqui está a rota:"+rota[0]+"\n");
+		//ROTA DE PRODUTOS
 		if(rota[0].equals("/produto")) {
-			if(reqS[0].startsWith("GET")) {
-				
-				Produto p = new Produto(params[0].substring(params[0].indexOf('=')));
-				
-				if(p.load()==1) {
-					
-					String body ="{\"codigo\":\""+p.getCodigo()+"\","
-					+"\"descricao\":\""+p.getDescricao()+"\","
-					+"\"valor\":\""+p.getValor()+"\","
-					+"\"estoque\":\""+p.getEstoque()+"\"}";
-					resTextAscii = "HTTP/1.1 200 OK\r\n"
-							+ "Content-Type: application/json; charset=utf-8\r\n"
-							+"Content-Length:"+ body.length() +"\r\n"
-							+ "\r\n"
-							+body;
-				}else {
-				
-					resTextAscii = "HTTP/1.1 200 OK\r\n"
-							+ "Content-Type: application/json; charset=utf-8\r\n"
-							+"Content-Length: 16 \r\n"
-							+ "\r\n"
-							+"{\"mensagem\":\"ok\"}";
-				}
-				
-			}else {
-				
-				resTextAscii = "HTTP/1.1 404 Not Found\r\n"
-						+ "Content-Type: text/html; charset=UTF-8\r\n"
-						+"Content-Length: 60 \r\n"
-						+ "\r\n"
-						+"<html>\n"
-						+ "<body>\n"
-						+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
-						+ "</body>\n"
-						+ "</html>"; 
-			}
+			
+			resTextAscii = produto(auxRota[0], params);
+			
 		}else {
 			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
 					+ "Content-Type: text/html; charset=UTF-8\r\n"
@@ -108,46 +79,53 @@ public class HttpLayer extends Thread {
 		this.socket = sock;
 	}
 
+	public String produto(String method, String[] params) {
+		String resTextAscii = "";
+		//Método GET
+		if(method.equals("GET")) {
+			
+			//recuperando o valor do parâmetro
+			Produto p = new Produto(params[0].substring(params[0].indexOf('=')+1));
+			//caso queira consultar um produto apenas
+			if(params[0].startsWith("produto")){
+				if(p.load()==1) {
+					
+					String body ="{\"codigo\":\""+p.getCodigo()+"\","
+					+"\"descricao\":\""+p.getDescricao()+"\","
+					+"\"valor\":\""+p.getValor()+"\","
+					+"\"estoque\":\""+p.getEstoque()+"\"}";
+					resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: application/json; charset=utf-8\r\n"
+							+"Content-Length:"+ body.length() +"\r\n"
+							+ "\r\n"
+							+body;
+				}else {
+					resTextAscii = "HTTP/1.1 404 Not Found\r\n"
+							+ "Content-Type: text/html; charset=UTF-8\r\n"
+							+"Content-Length: 60 \r\n"
+							+ "\r\n"
+							+"<html>\n"
+							+ "<body>\n"
+							+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
+							+ "</body>\n"
+							+ "</html>"; 
+				}
+			}else if(params[0].startsWith("produtos")) {
+				
+			}
+			else {
+			
+				resTextAscii = "HTTP/1.1 200 OK\r\n"
+						+ "Content-Type: application/json; charset=utf-8\r\n"
+						+"Content-Length: 16 \r\n"
+						+ "\r\n"
+						+"{\"mensagem\":\"ok\"}";
+			}
+			
+		}
+		return resTextAscii;
+	}
+
 	
-
-	public HttpLayer(Runnable target) {
-		super(target);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(ThreadGroup group, Runnable target) {
-		super(group, target);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(ThreadGroup group, String name) {
-		super(group, name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(Runnable target, String name) {
-		super(target, name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(ThreadGroup group, Runnable target, String name) {
-		super(group, target, name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(ThreadGroup group, Runnable target, String name, long stackSize) {
-		super(group, target, name, stackSize);
-		// TODO Auto-generated constructor stub
-	}
-
-	public HttpLayer(ThreadGroup group, Runnable target, String name, long stackSize, boolean inheritThreadLocals) {
-		super(group, target, name, stackSize, inheritThreadLocals);
-		// TODO Auto-generated constructor stub
-	}
 
 }
