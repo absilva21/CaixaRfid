@@ -1,8 +1,6 @@
 package api;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+
 import java.sql.*;
 
 //representa a classe que vai carregar ou persistir os dados
@@ -35,6 +33,7 @@ public class ProdutoDB implements IPersistente{
             	  produto.setDescricao(rs.getString(2));
             	  produto.setValor(rs.getDouble(3));
             	  produto.setEstoque(rs.getDouble(4));
+            	  connection.close();
             	  result = 1;
               }
             	  
@@ -45,9 +44,42 @@ public class ProdutoDB implements IPersistente{
 		
 		return result;
 	}
-	//se isUpadate for verdadeiro ele salva o registro na mesma linha
-	public int save(boolean isUpdate) {
+	//se isUpadate for verdadeiro faz o update
+	public int save(boolean update) {
 		int result = 0;
+		
+		if(update) {
+			
+		}else {
+			try {
+				Class.forName("org.sqlite.JDBC");
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+				 System.out.println("Conexão realizada !!!!");
+				 Statement statement = connection.createStatement();
+				 statement.executeUpdate("INSERT INTO produto(codigo,descricao,preco,qtd) VALUES (\""
+				 +produto.getCodigo()
+				 +"\",\""
+				 +produto.getDescricao()
+				 +"\","
+				 +Double.toString(produto.getValor())
+				 +","
+				 +Double.toString(produto.getEstoque())
+				 +")");
+				 connection.close();
+				 result = 1;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+		
 		return result;
 	}
 

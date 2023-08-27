@@ -38,8 +38,8 @@ public class Produto implements IPersistente{
 		return this.db.load();
 	}
 	
-	public int save(boolean isUpdate) {
-		return this.db.save( isUpdate);
+	public int save(boolean Update) {
+		return this.db.save( Update);
 		
 	}
 

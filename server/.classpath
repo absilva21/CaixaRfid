@@ -7,5 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/mensa/Downloads/sqlite-jdbc-3.6.14.1.jar/sqlite-jdbc-3.6.14.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mensa/Downloads/json-simple-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

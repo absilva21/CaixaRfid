@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import org.json.*;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import api.Produto;
 
@@ -26,11 +30,19 @@ public class HttpLayer extends Thread {
 		//resgata a rota
 		String[] rota = auxRota[1].split("\\?"); 
 		//resgata os parametros
-		String[] params = rota[1].split("&");
+		String[] params = null;
+		
+		if(rota.length>1) {
+			params = rota[1].split("&");
+		}else {
+			params = new String[1];
+			params[0] = "";
+		}
+		
 		//ROTA DE PRODUTOS
 		if(rota[0].equals("/produto")) {
 			
-			resTextAscii = produto(auxRota[0], params);
+			resTextAscii = produto(auxRota[0], params,reqS[reqS.length-1]);
 			
 		}else {
 			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
@@ -79,7 +91,7 @@ public class HttpLayer extends Thread {
 		this.socket = sock;
 	}
 
-	public String produto(String method, String[] params) {
+	public String produto(String method, String[] params,String b) {
 		String resTextAscii = "";
 		//Método GET
 		if(method.equals("GET")) {
@@ -121,6 +133,32 @@ public class HttpLayer extends Thread {
 						+ "\r\n"
 						+"{\"mensagem\":\"ok\"}";
 			}
+			
+		}if(method.equals("POST")) {
+			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
+					+ "Content-Type: text/plain; charset=utf-8\r\n"
+					+"Content-Length: 0 \r\n"
+					+ "\r\n";
+			
+			JSONParser parser = new JSONParser();  
+			try {
+				JSONObject json = (JSONObject) parser.parse(b);
+				
+				String codigo = json.get("codigo").toString();
+				String desc = json.get("descricao").toString();
+				double valor = Double.parseDouble(json.get("valor").toString());
+				double qtd = Double.parseDouble(json.get("estoque").toString());
+				Produto p = new Produto(codigo,desc,valor,qtd);
+				if(p.save(false)==1) {
+					resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: text/plain; charset=utf-8\r\n"
+							+"Content-Length: 0 \r\n"
+							+ "\r\n";
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  
 			
 		}
 		return resTextAscii;
