@@ -36,7 +36,7 @@ public class Caixa extends Application {
 		Socket leitor = new Socket("192.168.0.111",70);
 		
 		
-		System.out.println("aguardando leitura dos produtos...\n");
+		System.out.println("caixa aberto inicie uma compra digitando S\n");
 			
 		BufferedWriter bufferOut = new BufferedWriter(new OutputStreamWriter(leitor.getOutputStream()));
 		bufferOut.write( "read");

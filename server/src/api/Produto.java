@@ -42,6 +42,10 @@ public class Produto implements IPersistente{
 		return this.db.save( Update);
 		
 	}
+	
+	public int delete() {
+		return this.db.delete();
+	}
 
 	public String getCodigo() {
 		return codigo;

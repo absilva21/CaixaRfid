@@ -9,7 +9,7 @@ import org.json.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
+import api.Compra;
 import api.Produto;
 
 //representa a camada http
@@ -18,6 +18,20 @@ public class HttpLayer extends Thread {
 	
 	private String req;
 	private Socket socket;
+	public static final String  ERRO404 = "HTTP/1.1 404 Not Found\r\n"
+			+ "Content-Type: text/html; charset=UTF-8\r\n"
+			+"Content-Length: 60 \r\n"
+			+ "\r\n"
+			+"<html>\n"
+			+ "<body>\n"
+			+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
+			+ "</body>\n"
+			+ "</html>"; 
+	public static final String CODE200 = "HTTP/1.1 200 OK\r\n"
+			+ "Content-Type: text/plain; charset=utf-8\r\n"
+			+"Content-Length: 0 \r\n"
+			+ "\r\n";
+	
 
 	@Override
 	public void run() {
@@ -44,6 +58,8 @@ public class HttpLayer extends Thread {
 			
 			resTextAscii = produto(auxRota[0], params,reqS[reqS.length-1]);
 			
+		}else if(rota[0].equals("/compra")) {
+			resTextAscii = compra(auxRota[0], params, reqS[reqS.length-1]);
 		}else {
 			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
 					+ "Content-Type: text/html; charset=UTF-8\r\n"
@@ -90,9 +106,32 @@ public class HttpLayer extends Thread {
 		this.req = req;
 		this.socket = sock;
 	}
+	
+	public String compra(String method, String[] params,String b) {
+		String resTextAscii = ERRO404;
+		if(method.equals("POST")) {
+			JSONParser parser = new JSONParser(); 
+			try {
+				JSONObject json = (JSONObject) parser.parse(b);
+				String[] produtos = json.get("produtos").toString().split(",");
+				int caixa = Integer.parseInt(json.get("caixa").toString());
+				Compra c = new Compra(produtos,caixa);
+				if(c.load()==1) {
+					resTextAscii = CODE200;
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  
+			
+		}
+		
+		return resTextAscii;
+	}
 
 	public String produto(String method, String[] params,String b) {
-		String resTextAscii = "";
+		String resTextAscii = ERRO404;
+		
 		//Método GET
 		if(method.equals("GET")) {
 			
@@ -111,16 +150,6 @@ public class HttpLayer extends Thread {
 							+"Content-Length:"+ body.getBytes().length +"\r\n"
 							+ "\r\n"
 							+body;
-				}else {
-					resTextAscii = "HTTP/1.1 404 Not Found\r\n"
-							+ "Content-Type: text/html; charset=UTF-8\r\n"
-							+"Content-Length: 60 \r\n"
-							+ "\r\n"
-							+"<html>\n"
-							+ "<body>\n"
-							+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
-							+ "</body>\n"
-							+ "</html>"; 
 				}
 			}else if(params[0].startsWith("produtos")) {
 				
@@ -134,11 +163,9 @@ public class HttpLayer extends Thread {
 						+"{\"mensagem\":\"ok\"}";
 			}
 			
-		}if(method.equals("POST")) {
-			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
-					+ "Content-Type: text/plain; charset=utf-8\r\n"
-					+"Content-Length: 0 \r\n"
-					+ "\r\n";
+		}
+		
+		if(method.equals("POST")) {
 			
 			JSONParser parser = new JSONParser();  
 			try {
@@ -150,16 +177,40 @@ public class HttpLayer extends Thread {
 				double qtd = Double.parseDouble(json.get("estoque").toString());
 				Produto p = new Produto(codigo,desc,valor,qtd);
 				if(p.save(false)==1) {
-					resTextAscii = "HTTP/1.1 200 OK\r\n"
-							+ "Content-Type: text/plain; charset=utf-8\r\n"
-							+"Content-Length: 0 \r\n"
-							+ "\r\n";
+					resTextAscii = CODE200;
 				}
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}  
 			
+		}
+		
+		if(method.equals("PUT")){
+			JSONParser parser = new JSONParser();  
+			try {
+				JSONObject json = (JSONObject) parser.parse(b);
+				
+				String codigo = json.get("codigo").toString();
+				String desc = json.get("descricao").toString();
+				double valor = Double.parseDouble(json.get("valor").toString());
+				double qtd = Double.parseDouble(json.get("estoque").toString());
+				Produto p = new Produto(codigo,desc,valor,qtd);
+				if(p.save(true)==1) {
+					resTextAscii = CODE200;
+				}
+			}catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			}  
+		}
+		if(method.equals("DELETE")) {
+			Produto p = new Produto(params[0].substring(params[0].indexOf('=')+1));
+			if(params[0].startsWith("produto")){
+				if(p.delete()==1) {
+					resTextAscii = CODE200;
+				}
+			}
 		}
 		return resTextAscii;
 	}

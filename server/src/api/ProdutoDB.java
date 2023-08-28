@@ -49,6 +49,29 @@ public class ProdutoDB implements IPersistente{
 		int result = 0;
 		
 		if(update) {
+			try {
+				Class.forName("org.sqlite.JDBC");
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+				Statement statement = connection.createStatement();
+				statement.executeUpdate("UPDATE produto SET descricao =  "
+				+"\""
+			    +produto.getDescricao()
+			    +"\",preco = "
+			    +Double.toString(produto.getValor())
+			    +",qtd = "
+			    +Double.toString(produto.getEstoque()) 
+			    +" WHERE codigo = \""
+			    +produto.getCodigo()
+			    +"\"");
+				result = 1;
+			}catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}else {
 			try {
@@ -83,6 +106,31 @@ public class ProdutoDB implements IPersistente{
 		return result;
 	}
 
+	public int delete() {
+		int result = 0;
+		
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+			 System.out.println("Conexão realizada !!!!");
+			 Statement statement = connection.createStatement();
+			 statement.executeUpdate("DELETE FROM produto WHERE codigo = \""
+			 +produto.getCodigo()
+			 +"\""
+			 );
+			 result = 1; 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
 	public Produto getProduto() {
 		return produto;
 	}
