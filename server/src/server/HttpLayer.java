@@ -109,6 +109,36 @@ public class HttpLayer extends Thread {
 	
 	public String compra(String method, String[] params,String b) {
 		String resTextAscii = ERRO404;
+		
+		if(method.equals("GET")) {
+			
+			if(params[0].startsWith("codigo")){
+				Compra compra = new Compra(Integer.parseInt(params[0].substring(params[0].indexOf('=')+1)));
+				if(compra.load()==1) {
+					String body ="{\"codigo\"=\""
+					+Integer.toString(compra.getCodigo())
+					+"\","
+					+"\"produtos\"=[";
+					for(int i = 0;i<compra.getProdutos().length;i++) {
+						body +=  compra.getProdutos()[i] +",";
+					}
+				 body += "],\"caixa\"=\""
+				 +Integer.toString(compra.getCaixa())
+				 +"\"}"; 
+				 
+				 resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: application/json; charset=utf-8\r\n"
+							+"Content-Length:"+ body.getBytes().length +"\r\n"
+							+ "\r\n"
+							+body;
+				 
+				}
+			}
+			
+			
+			
+		}
+		
 		if(method.equals("POST")) {
 			JSONParser parser = new JSONParser(); 
 			try {

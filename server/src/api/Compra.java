@@ -8,6 +8,16 @@ public class Compra implements IPersistente {
 	//codigo do caixa
 	private int caixa;
 	
+	private CompraDB compraDB;
+	
+	public CompraDB getCompraDB() {
+		return compraDB;
+	}
+
+	public void setCompraDB(CompraDB compraDB) {
+		this.compraDB = compraDB;
+	}
+
 	public int getCodigo() {
 		return codigo;
 	}
@@ -38,12 +48,14 @@ public class Compra implements IPersistente {
 		this.codigo = cod;
 		this.caixa = 0;
 		this.produtos = null;
+		this.compraDB = new CompraDB(this);
 	}
 	
 	//para cadastro, o codigo é auto-incremento 
 	public Compra(String[] p, int cx ) {
 		this.produtos = p;
 		this.caixa = cx;
+		this.compraDB = new CompraDB(this);
 	}
 	
 	@Override
@@ -55,7 +67,7 @@ public class Compra implements IPersistente {
 	@Override
 	public int load() {
 		// TODO Auto-generated method stub
-		return 0;
+		return this.compraDB.load();
 	}
 
 	@Override
