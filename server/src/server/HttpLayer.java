@@ -120,14 +120,14 @@ public class HttpLayer extends Thread {
 					
 					String[] produtos = compra.getProdutos().toArray(new String[0]);
 					
-					String body ="{\"codigo\"=\""
+					String body ="{\"codigo\":\""
 					+Integer.toString(compra.getCodigo())
 					+"\","
-					+"\"produtos\"=[";
+					+"\"produtos\":[";
 					for(int i = 0;i<produtos.length;i++) {
 						body +=  produtos[i] +",";
 					}
-				 body += "],\"caixa\"=\""
+				 body += "],\"caixa\":\""
 				 +Integer.toString(compra.getCaixa())
 				 +"\"}"; 
 				 

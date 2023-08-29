@@ -64,7 +64,7 @@ public class Compra implements IPersistente {
 	@Override
 	public int save(boolean isUpdate) {
 		// TODO Auto-generated method stub
-		return 0;
+		return this.compraDB.save(isUpdate);
 	}
 
 	@Override

@@ -23,7 +23,35 @@ public class CompraDB implements IPersistente {
 	@Override
 	public int save(boolean isUpdate) {
 		// TODO Auto-generated method stub
-		return 0;
+		int result = 0;
+		
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		 try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+			 Statement statement = connection.createStatement();
+			 statement.executeUpdate("INSERT INTO compra(caixa) VALUES ("
+			 +Integer.toString(compra.getCaixa())
+			 +")");
+			 String[] produtos = compra.getProdutos().toArray(new String[0]);
+			 
+			 for(int i=0;i<produtos.length;i++) {
+				 statement.executeUpdate("INSERT INTO produto_compra(compra,produto) VALUES ((SELECT  COUNT(*) FROM compra),"
+				 +"\""
+			     +produtos[i]
+				 +"\")");
+			 }
+			 
+			 result = 1;
+		 } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	@Override

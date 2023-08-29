@@ -9,9 +9,8 @@ import java.io.OutputStreamWriter;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
+
 
 
 public class Caixa extends Application {
@@ -36,7 +35,6 @@ public class Caixa extends Application {
 		Socket leitor = new Socket("192.168.0.111",70);
 		
 		
-		System.out.println("caixa aberto inicie uma compra digitando S\n");
 			
 		BufferedWriter bufferOut = new BufferedWriter(new OutputStreamWriter(leitor.getOutputStream()));
 		bufferOut.write( "read");
