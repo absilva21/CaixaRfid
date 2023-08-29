@@ -1,10 +1,12 @@
 package api;
 
+import java.util.LinkedList;
+
 public class Compra implements IPersistente {
 	//codigo da compra
 	private int codigo;
 	//codigos dos produtos
-	private String[] produtos;
+	private  LinkedList<String> produtos;
 	//codigo do caixa
 	private int caixa;
 	
@@ -26,11 +28,12 @@ public class Compra implements IPersistente {
 		this.codigo = codigo;
 	}
 
-	public String[] getProdutos() {
+
+	public LinkedList<String> getProdutos() {
 		return produtos;
 	}
 
-	public void setProdutos(String[] produtos) {
+	public void setProdutos(LinkedList<String> produtos) {
 		this.produtos = produtos;
 	}
 
@@ -52,7 +55,7 @@ public class Compra implements IPersistente {
 	}
 	
 	//para cadastro, o codigo é auto-incremento 
-	public Compra(String[] p, int cx ) {
+	public Compra( LinkedList<String> p, int cx ) {
 		this.produtos = p;
 		this.caixa = cx;
 		this.compraDB = new CompraDB(this);

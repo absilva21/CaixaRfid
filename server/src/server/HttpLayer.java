@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+
 import org.json.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -115,12 +117,15 @@ public class HttpLayer extends Thread {
 			if(params[0].startsWith("codigo")){
 				Compra compra = new Compra(Integer.parseInt(params[0].substring(params[0].indexOf('=')+1)));
 				if(compra.load()==1) {
+					
+					String[] produtos = compra.getProdutos().toArray(new String[0]);
+					
 					String body ="{\"codigo\"=\""
 					+Integer.toString(compra.getCodigo())
 					+"\","
 					+"\"produtos\"=[";
-					for(int i = 0;i<compra.getProdutos().length;i++) {
-						body +=  compra.getProdutos()[i] +",";
+					for(int i = 0;i<produtos.length;i++) {
+						body +=  produtos[i] +",";
 					}
 				 body += "],\"caixa\"=\""
 				 +Integer.toString(compra.getCaixa())
@@ -143,16 +148,22 @@ public class HttpLayer extends Thread {
 			JSONParser parser = new JSONParser(); 
 			try {
 				JSONObject json = (JSONObject) parser.parse(b);
-				String[] produtos = json.get("produtos").toString().split(",");
-				int caixa = Integer.parseInt(json.get("caixa").toString());
+				String[] p = json.get("produtos").toString().split(",");
+				LinkedList<String> produtos = new LinkedList<String>();
+				
+				for(int i=0;i<p.length;i++) {
+					produtos.add(p[i]);
+				}
+				
+ 				int caixa = Integer.parseInt(json.get("caixa").toString());
 				Compra c = new Compra(produtos,caixa);
-				if(c.load()==1) {
+				if(c.save(false)==1) {
 					resTextAscii = CODE200;
 				}
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}  
+			} 
 			
 		}
 		

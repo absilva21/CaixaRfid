@@ -1,6 +1,7 @@
 package api;
 
 import java.sql.*;
+import java.util.LinkedList;
 
 public class CompraDB implements IPersistente {
 	
@@ -46,30 +47,18 @@ public class CompraDB implements IPersistente {
 			  ResultSet resAux = statementAux.executeQuery("SELECT produto  FROM produto_compra WHERE compra = "
 			  +Integer.toString(this.compra.getCodigo()));
 			  
-			  if(rs.getType() == ResultSet.TYPE_FORWARD_ONLY ) {
-				  this.compra.setCaixa(Integer.parseInt(rs.getString("caixa")));
-				  rs.close();
-				  int length = 0;
-				  if(rs.getType() == ResultSet.TYPE_FORWARD_ONLY ) {
-					  this.compra.setProdutos(new String[1]);
-					  this.compra.getProdutos()[0] = resAux.getString("produto");
-				  }else{
-					  while(resAux.next()) {
-						  length ++;
-					  }
-					  this.compra.setProdutos(new String[length]);
-					  resAux.beforeFirst();
-					  while(resAux.next()) {
-						  this.compra.getProdutos()[resAux.getRow()-1] = resAux.getString("produto");
-					  }
-				  }
-				 
-				  
-				  
-				  result = 1;
-			  }
-			 
 			  
+			  this.compra.setCaixa(Integer.parseInt(rs.getString("caixa")));
+			  rs.close();
+			
+					  
+			  this.compra.setProdutos(new LinkedList<String>());
+					 
+			  while(resAux.next()) {	
+				  this.compra.getProdutos().add(resAux.getString("produto")); 
+			  }
+				  
+			  result = 1; 
 			  
 		 } catch (SQLException e) {
 			// TODO Auto-generated catch block
