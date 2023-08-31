@@ -40,7 +40,7 @@ public class CompraDB implements IPersistente {
 			 String[] produtos = compra.getProdutos().toArray(new String[0]);
 			 
 			 for(int i=0;i<produtos.length;i++) {
-				 statement.executeUpdate("INSERT INTO produto_compra(compra,produto) VALUES ((SELECT  COUNT(*) FROM compra),"
+				 statement.executeUpdate("INSERT INTO produto_compra(compra,produto) VALUES ((SELECT  MAX(codigo) FROM compra),"
 				 +"\""
 			     +produtos[i]
 				 +"\")");
