@@ -18,7 +18,7 @@ public class ProdutoDB implements IPersistente{
 	//retorna 1 se tiver concluido, 0 se não encontrar a linha, -1 se der erro
 	public int load(){
 		int result = 0;
-		 try {
+		try {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e1) {
 			// TODO Auto-generated catch block

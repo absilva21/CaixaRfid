@@ -25,7 +25,7 @@ public class Caixa {
 			comando = teclado.next();
 			
 			if(comando.equals("l")) {
-				Socket leitor = new Socket("172.16.103.0",7700);
+				Socket leitor = new Socket("172.16.103.0",7710);
 				
 				BufferedWriter bufferOut = new BufferedWriter(new OutputStreamWriter(leitor.getOutputStream()));
 				bufferOut.write( "read");

@@ -6,7 +6,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
-
+import api.Caixa;
 import org.json.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,6 +37,7 @@ public class HttpLayer extends Thread {
 
 	@Override
 	public void run() {
+		
 		//dividindo a requisição em linhas
 		String[] reqS = req.split("\r\n");
 		//separando a primeira linha
@@ -62,6 +63,8 @@ public class HttpLayer extends Thread {
 			
 		}else if(rota[0].equals("/compra")) {
 			resTextAscii = compra(auxRota[0], params, reqS[reqS.length-1]);
+		}else if(rota[0].equals("/caixa")){
+			resTextAscii = caixa(auxRota[0], params, reqS[reqS.length-1]);
 		}else {
 			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
 					+ "Content-Type: text/html; charset=UTF-8\r\n"
@@ -107,6 +110,73 @@ public class HttpLayer extends Thread {
 		// TODO Auto-generated constructor stub
 		this.req = req;
 		this.socket = sock;
+	}
+	
+	public String caixa(String method, String[] params,String b) {
+		String resTextAscii = ERRO404;
+		
+		if(method.equals("GET")) {
+			if(params[0].startsWith("codigo")){
+				Caixa caixa = new Caixa(Integer.parseInt(params[0].substring(params[0].indexOf('=')+1)));
+				if(caixa.load()==1) {
+					String body ="{\"codigo\":\""
+							+Integer.toString(caixa.getCodigo())
+							+"\","
+							+"\"ip\":\""
+							+caixa.getIp()
+							+"\"}";
+					 resTextAscii = "HTTP/1.1 200 OK\r\n"
+								+ "Content-Type: application/json; charset=utf-8\r\n"
+								+"Content-Length:"+ body.getBytes().length +"\r\n"
+								+ "\r\n"
+								+body;
+					
+				}
+			}
+		}
+		
+		if(method.equals("POST")) {
+			JSONParser parser = new JSONParser(); 
+			
+			try {
+				JSONObject json = (JSONObject) parser.parse(b);
+				Caixa caixa = new Caixa(0,json.get("ip").toString());
+				if(caixa.save(false)==1) {
+					 resTextAscii = CODE200;
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		if(method.equals("DELETE")) {
+			if(params[0].startsWith("codigo")){
+				Caixa caixa = new Caixa(Integer.parseInt(params[0].substring(params[0].indexOf('=')+1)));
+				if(caixa.delete()==1) {
+					 resTextAscii = CODE200;
+				}
+			}
+		}
+		
+		if(method.equals("PUT")) {
+			JSONParser parser = new JSONParser(); 
+			
+			try {
+				JSONObject json = (JSONObject) parser.parse(b);
+				Caixa caixa = new Caixa(Integer.parseInt(json.get("codigo").toString()),json.get("ip").toString());
+				if(caixa.save(true)==1) {
+					 resTextAscii = CODE200;
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		return resTextAscii;
 	}
 	
 	public String compra(String method, String[] params,String b) {
