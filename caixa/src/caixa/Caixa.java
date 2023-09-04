@@ -72,10 +72,7 @@ public class Caixa {
 				
 				String[] produtos = req.split("\n");
 				
-				System.out.println("\nprodutos: \n");
-				for(int i=0;i<produtos.length;i++) {
-					System.out.println(produtos[i]);
-				}
+				
 				for(int i=0;i<produtos.length;i++) {
 					HttpClient client = HttpClient.newHttpClient();
 					HttpRequest request = HttpRequest.newBuilder()
@@ -84,8 +81,9 @@ public class Caixa {
 					          .uri(URI.create("http://"
 					          +ipSever
 					          +"/produto?produto="
-					          +produtos[i]))
+					          +produtos[i])).header("auth", "202cb962ac59075b964b07152d234b70")
 					          .build();
+					
 
 					HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
 					if(response.statusCode()==200) {
