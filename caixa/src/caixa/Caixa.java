@@ -90,13 +90,17 @@ public class Caixa {
 					HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
 					if(response.statusCode()==200) {
 						JSONParser parser = new JSONParser();  
+						
 						try {
 							JSONObject json = (JSONObject) parser.parse(response.body());
 							System.out.println("\ncodigo             descricão            valor\n");
 							System.out.println("\n"+json.get("codigo")+"             "+json.get("descricao")+"           R$"+ json.get("valor")+"\n");
-						}catch(ParseException e) {
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+					}else{
+						System.out.println("não foi possível consultar a base de dados");
 					}
 				}
 				
