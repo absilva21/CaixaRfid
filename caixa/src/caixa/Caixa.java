@@ -6,8 +6,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.URI;
 import java.net.UnknownHostException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Scanner;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Caixa {
 
@@ -15,17 +24,26 @@ public class Caixa {
 		// TODO Auto-generated constructor stub
 	}
 
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		Scanner teclado = new Scanner(System.in);
 		String comando = "";
+		String ipSever = "";
+		String ipLeitor = "";
+		String user =  "";
+		String auth = "";
+		System.out.println("digite o ip do servidor\n");
+		ipSever = teclado.next();
+		System.out.println("digite o ip do leitor\n");
+		ipLeitor = teclado.next();
+		
 		
 		while(true) {
 			System.out.println("Digite um comando:\n");
 			comando = teclado.next();
 			
 			if(comando.equals("l")) {
-				Socket leitor = new Socket("172.16.103.0",7710);
+				Socket leitor = new Socket(ipLeitor,7710);
 				
 				BufferedWriter bufferOut = new BufferedWriter(new OutputStreamWriter(leitor.getOutputStream()));
 				bufferOut.write( "read");
@@ -58,12 +76,15 @@ public class Caixa {
 				for(int i=0;i<produtos.length;i++) {
 					System.out.println(produtos[i]);
 				}
-				/*for(int i=0;i<produtos.length;i++) {
+				for(int i=0;i<produtos.length;i++) {
 					HttpClient client = HttpClient.newHttpClient();
 					HttpRequest request = HttpRequest.newBuilder()
 					          .GET()
 					          .timeout(Duration.ofSeconds(10))
-					          .uri(URI.create("http://172.16.103.240/produto?produto="+produtos[i]))
+					          .uri(URI.create("http://"
+					          +ipSever
+					          +"/produto?produto="
+					          +produtos[i]))
 					          .build();
 
 					HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
@@ -71,13 +92,13 @@ public class Caixa {
 						JSONParser parser = new JSONParser();  
 						try {
 							JSONObject json = (JSONObject) parser.parse(response.body());
-							System.out.println("\ncodigo             descric„o            valor\n");
+							System.out.println("\ncodigo             descric√£o            valor\n");
 							System.out.println("\n"+json.get("codigo")+"             "+json.get("descricao")+"           R$"+ json.get("valor")+"\n");
 						}catch(ParseException e) {
 							e.printStackTrace();
 						}
 					}
-				}*/
+				}
 				
 			}
 			

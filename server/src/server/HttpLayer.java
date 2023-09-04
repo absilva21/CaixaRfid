@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import api.Caixa;
+import java.sql.*;
 import org.json.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,7 +34,11 @@ public class HttpLayer extends Thread {
 			+ "Content-Type: text/plain; charset=utf-8\r\n"
 			+"Content-Length: 0 \r\n"
 			+ "\r\n";
-	
+	public static final String CODE401 = "HTTP/1.1 401 Unauthorized\r\n"
+			+"WWW-Authenticate: Basic realm=\"Restricted area\"\r\n"
+			+ "Content-Type: text/plain; charset=utf-8\r\n"
+			+"Content-Length: 0 \r\n"
+			+ "\r\n";
 
 	@Override
 	public void run() {
@@ -49,6 +54,17 @@ public class HttpLayer extends Thread {
 		//resgata os parametros
 		String[] params = null;
 		
+	    String key = "";
+	    
+	    for(int i = 0;i<reqS.length;i++) {
+	    	if(reqS[i].startsWith("auth")) {
+	    		key = reqS[i];
+	    		break;
+	    		
+	    	}
+	    }
+		
+	    
 		if(rota.length>1) {
 			params = rota[1].split("&");
 		}else {
@@ -56,26 +72,22 @@ public class HttpLayer extends Thread {
 			params[0] = "";
 		}
 		
-		//ROTA DE PRODUTOS
-		if(rota[0].equals("/produto")) {
-			
-			resTextAscii = produto(auxRota[0], params,reqS[reqS.length-1]);
-			
-		}else if(rota[0].equals("/compra")) {
-			resTextAscii = compra(auxRota[0], params, reqS[reqS.length-1]);
-		}else if(rota[0].equals("/caixa")){
-			resTextAscii = caixa(auxRota[0], params, reqS[reqS.length-1]);
+		
+		if(auth(key)) {
+			//ROTA DE PRODUTOS
+			if(rota[0].equals("/produto")) {
+				resTextAscii = produto(auxRota[0], params,reqS[reqS.length-1]);
+			}else if(rota[0].equals("/compra")) {
+				resTextAscii = compra(auxRota[0], params, reqS[reqS.length-1]);
+			}else if(rota[0].equals("/caixa")){
+				resTextAscii = caixa(auxRota[0], params, reqS[reqS.length-1]);
+			}else {
+				resTextAscii = ERRO404; 
+			}
 		}else {
-			resTextAscii = "HTTP/1.1 404 Not Found\r\n"
-					+ "Content-Type: text/html; charset=UTF-8\r\n"
-					+"Content-Length: 60 \r\n"
-					+ "\r\n"
-					+"<html>\n"
-					+ "<body>\n"
-					+ "<h1>erro 404 o recurso não pode ser encontrado</h1>\n"
-					+ "</body>\n"
-					+ "</html>"; 
+			resTextAscii = CODE401;
 		}
+		
 		
 		 
 		byte[] bytes = resTextAscii.getBytes(StandardCharsets.UTF_8);
@@ -110,6 +122,12 @@ public class HttpLayer extends Thread {
 		// TODO Auto-generated constructor stub
 		this.req = req;
 		this.socket = sock;
+	}
+	
+	public String usuario(String method, String[] params,String b) {
+		String resTextAscii = ERRO404;
+		
+		return resTextAscii; 
 	}
 	
 	public String caixa(String method, String[] params,String b) {
@@ -262,8 +280,6 @@ public class HttpLayer extends Thread {
 							+ "\r\n"
 							+body;
 				}
-			}else if(params[0].startsWith("produtos")) {
-				
 			}
 			else {
 			
@@ -326,6 +342,34 @@ public class HttpLayer extends Thread {
 		return resTextAscii;
 	}
 
-	
+	public boolean auth(String key ) {
+		boolean result = false;
+		String[] aux = key.split(":");
+		if(aux.length>1) {
+			try {
+				Class.forName("org.sqlite.JDBC");
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+				Statement statement = connection.createStatement();
+				ResultSet rs = statement.executeQuery("SELECT * FROM usuario  WHERE auth = \""
+					      +aux[1].substring(1)
+					      +"\"");
+				
+			
+				if(rs.next()) {
+					result = true;
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
 
 }
