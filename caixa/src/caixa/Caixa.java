@@ -109,7 +109,10 @@ public class Caixa {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}else{
+					}else if(response.statusCode()==401) {
+						System.out.println("Caixa bloqueado procure outro disponível");
+					}
+					else{
 						System.out.println("não foi possível consultar a base de dados");
 					}
 				}
