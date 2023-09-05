@@ -158,7 +158,7 @@ public class HttpLayer extends Thread {
 			
 			try {
 				JSONObject json = (JSONObject) parser.parse(b);
-				Caixa caixa = new Caixa(0,json.get("ip").toString());
+				Caixa caixa = new Caixa(0,json.get("ip").toString(),Boolean.parseBoolean(json.get("acesso").toString()));
 				if(caixa.save(false)==1) {
 					 resTextAscii = CODE200;
 				}
@@ -183,7 +183,7 @@ public class HttpLayer extends Thread {
 			
 			try {
 				JSONObject json = (JSONObject) parser.parse(b);
-				Caixa caixa = new Caixa(Integer.parseInt(json.get("codigo").toString()),json.get("ip").toString());
+				Caixa caixa = new Caixa(Integer.parseInt(json.get("codigo").toString()),json.get("ip").toString(),Boolean.parseBoolean(json.get("acesso").toString()));
 				if(caixa.save(true)==1) {
 					 resTextAscii = CODE200;
 				}
@@ -361,7 +361,21 @@ public class HttpLayer extends Thread {
 				
 			
 				if(rs.next()) {
-					result = true;
+					int codigo = rs.getInt(1) ;
+					int tipo = rs.getInt(3);
+					
+					if(tipo==1) {
+						result = true;
+					}else{
+						 rs = statement.executeQuery("SELECT acesso FROM usuario_caixa  WHERE caixa = "
+							      +Integer.toString(codigo));
+						 if(rs.next()) {
+							 if(rs.getInt(1)==1) {
+								 result = true;
+							 }
+						 }
+					}
+					
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block

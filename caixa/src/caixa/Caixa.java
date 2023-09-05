@@ -5,12 +5,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Scanner;
 
@@ -30,12 +33,21 @@ public class Caixa {
 		String comando = "";
 		String ipSever = "";
 		String ipLeitor = "";
-		String user =  "";
 		String auth = "";
 		System.out.println("digite o ip do servidor\n");
 		ipSever = teclado.next();
-		System.out.println("digite o ip do leitor\n");
+		System.out.println("digite bo ip do leitor\n");
 		ipLeitor = teclado.next();
+		System.out.println("digite a chave do usuário\n");
+		auth = teclado.next();
+		
+		MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        BigInteger hash = new BigInteger(1, md.digest(auth.getBytes()));
 		
 		
 		while(true) {
@@ -81,7 +93,7 @@ public class Caixa {
 					          .uri(URI.create("http://"
 					          +ipSever
 					          +"/produto?produto="
-					          +produtos[i])).header("auth", "202cb962ac59075b964b07152d234b70")
+					          +produtos[i])).header("auth", hash.toString(16))
 					          .build();
 					
 

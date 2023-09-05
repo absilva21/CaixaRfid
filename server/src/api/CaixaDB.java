@@ -26,15 +26,30 @@ public class CaixaDB implements IPersistente {
 		
 		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
 			Statement statement = connection.createStatement();
+			int acesso = 0;
+			
+			if(caixa.isAcesso()) {
+				acesso = 1;
+			}
+			
 			if(isUpdate) {
 				statement.executeUpdate("UPDATE  caixa SET ip = \""
 				+caixa.getIp()
 				+"\" WHERE codigo = "
 				+Integer.toString(caixa.getCodigo()));
+				
+				
+				
+				statement.executeUpdate("UPADTE usuario_caixa SET acesso = "
+				+Integer.toString(acesso));
+				
 			}else {
 				statement.executeUpdate("INSERT INTO caixa(ip) VALUES (\""
 				+caixa.getIp()
 				+"\")");
+				
+				/*statement.executeUpdate("INSERT INTO usuario_caixa()  acesso = "
+						+Integer.toString(acesso));*/
 			}
 			
 			result = 1;
