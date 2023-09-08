@@ -40,19 +40,41 @@ public class CaixaDB implements IPersistente {
 				
 				
 				
-				statement.executeUpdate("UPADTE usuario_caixa SET acesso = "
-				+Integer.toString(acesso));
+				statement.executeUpdate("UPDATE usuario_caixa SET acesso = "
+				+Integer.toString(acesso)
+				+" WHERE caixa = "
+				+Integer.toString(caixa.getCodigo()));
+				result = 1;
 				
 			}else {
-				statement.executeUpdate("INSERT INTO caixa(ip) VALUES (\""
-				+caixa.getIp()
-				+"\")");
+				Usuario usuario = new Usuario(0,caixa.getAuth(),2);
+				int test = usuario.save(false);
+				if(test==1) {
+					statement.executeUpdate("INSERT INTO caixa(ip) VALUES (\""
+							+caixa.getIp()
+							+"\")");
+					ResultSet rs = statement.executeQuery("SELECT MAX(codigo) FROM caixa");
+					if(rs.next()) {
+						statement.executeUpdate("INSERT INTO usuario_caixa(usuario,caixa,acesso) VALUES ("
+					    +Integer.toString(usuario.getCodigo())
+					    +","
+					    +rs.getString(1)
+					    +","
+					    +Integer.toString(1)
+					    +")");
+						result = 1;
+					}
+				    
+			    }
 				
-				/*statement.executeUpdate("INSERT INTO usuario_caixa()  acesso = "
-						+Integer.toString(acesso));*/
+				if(test == 2) {
+					result = 2;
+				}
+				
+			
 			}
 			
-			result = 1;
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,8 +100,22 @@ public class CaixaDB implements IPersistente {
 			
 			if(rs.next()) {
 				caixa.setIp(rs.getString(2));
-				result = 1;
+				String codigo = rs.getString(1);
+				 rs = statement.executeQuery("SELECT acesso FROM usuario_caixa WHERE caixa = "
+				+ codigo);
+				if(rs.next()) {
+					if(rs.getInt(1)==1) {
+						caixa.setAcesso(true);
+					}else {
+						caixa.setAcesso(false);
+						
+					}
+					result = 1;
+				}
+				
 			}
+			
+			
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

@@ -6,10 +6,19 @@ public class Caixa implements IPersistente {
 	private int codigo;
 	private String ip;
 	private boolean acesso;
+	private String auth;
 	private CaixaDB db;
 	
 	public boolean isAcesso() {
 		return acesso;
+	}
+
+	public String getAuth() {
+		return auth;
+	}
+
+	public void setAuth(String auth) {
+		this.auth = auth;
 	}
 
 	public void setAcesso(boolean acesso) {
@@ -30,13 +39,15 @@ public class Caixa implements IPersistente {
 		// TODO Auto-generated constructor stub
 		this.codigo = cod;
 		this.ip = "";
+		this.auth = "";
 		this.acesso = false;
 		this.db = new CaixaDB(this);
 	}
 	
-	public Caixa(int cod,String ip, boolean acs) {
+	public Caixa(int cod,String ip, boolean acs,String auth) {
 		this.codigo = cod;
 		this.ip = ip;
+		this.auth = auth;
 		this.acesso = acs;
 		this.db = new CaixaDB(this);
 	}

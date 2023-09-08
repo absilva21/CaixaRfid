@@ -38,15 +38,32 @@ public class UsuarioDB implements IPersistente {
 						+"\",tipo = "
 						+Integer.toString(this.usuario.getTipo()));
 			}else {
+				
 				Statement statement = connection.createStatement();
-				statement.executeUpdate("INSERT INTO usuario(auth,tipo) VALUES (\""
-				+this.usuario.getAuth()
-				+"\","
-				+Integer.toString(this.usuario.getTipo())
-				+")"
-				);
+				ResultSet rs = statement.executeQuery("SELECT * FROM usuario WHERE auth = \""
+				+usuario.getAuth()
+				+"\"");
+			    if(rs.next()) {
+			    	result = 2;
+			    }else {
+			    	statement.executeUpdate("INSERT INTO usuario(auth,tipo) VALUES (\""
+							+this.usuario.getAuth()
+							+"\","
+							+Integer.toString(this.usuario.getTipo())
+							+")"
+							);
+			    	 rs = statement.executeQuery("SELECT * FROM usuario WHERE auth = \""
+							+usuario.getAuth()
+							+"\"");
+			    	 if(rs.next()) {
+			    		 usuario.setCodigo(rs.getInt(1));
+			    		 result = 1;
+			    	 }
+			    	
+			    }
+				
 			}
-			result = 1;
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

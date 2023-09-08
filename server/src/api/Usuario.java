@@ -61,7 +61,7 @@ public class Usuario implements IPersistente {
 	@Override
 	public int save(boolean isUpdate) {
 		// TODO Auto-generated method stub
-		return 0;
+		return this.db.save(isUpdate);
 	}
 
 	@Override

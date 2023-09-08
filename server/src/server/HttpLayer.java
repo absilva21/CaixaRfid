@@ -34,6 +34,13 @@ public class HttpLayer extends Thread {
 			+ "Content-Type: text/plain; charset=utf-8\r\n"
 			+"Content-Length: 0 \r\n"
 			+ "\r\n";
+	
+	public static final String CODE500 = "HTTP/1.1 200 OK\r\n"
+			+ "Content-Type: text/plain; charset=utf-8\r\n"
+			+"Content-Length: 0 \r\n"
+			+ "\r\n"
+			+"erro interno";
+	
 	public static final String CODE401 = "HTTP/1.1 401 Unauthorized\r\n"
 			+"WWW-Authenticate: Basic realm=\"Restricted area\"\r\n"
 			+ "Content-Type: text/plain; charset=utf-8\r\n"
@@ -150,18 +157,60 @@ public class HttpLayer extends Thread {
 								+body;
 					
 				}
+			}else {
+				try {
+					Class.forName("org.sqlite.JDBC");
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+					String body = "{\"caixas\":[";
+					Statement statement = connection.createStatement();
+					ResultSet rs = statement.executeQuery("SELECT * FROM caixa");
+					
+					while(rs.next()) {
+						body += "{\"codigo\":\""
+								+rs.getString(1)
+								+"\","
+								+"\"ip\":\""
+								+rs.getString(2)
+								+"\"},";
+					}
+					
+					body += "]}";
+					
+					 resTextAscii = "HTTP/1.1 200 OK\r\n"
+								+ "Content-Type: application/json; charset=utf-8\r\n"
+								+"Content-Length:"+ body.getBytes().length +"\r\n"
+								+ "\r\n"
+								+body;
+					
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		
 		if(method.equals("POST")) {
 			JSONParser parser = new JSONParser(); 
-			
+			int result = 0;
 			try {
 				JSONObject json = (JSONObject) parser.parse(b);
-				Caixa caixa = new Caixa(0,json.get("ip").toString(),Boolean.parseBoolean(json.get("acesso").toString()));
-				if(caixa.save(false)==1) {
+				Caixa caixa = new Caixa(0,json.get("ip").toString(),Boolean.parseBoolean(json.get("acesso").toString()),json.get("auth").toString());
+				result = caixa.save(false);
+				if(result==1) {
 					 resTextAscii = CODE200;
 				}
+				
+				if(result==2) {
+					resTextAscii = CODE500;
+				}
+				
+			
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -179,18 +228,35 @@ public class HttpLayer extends Thread {
 		}
 		
 		if(method.equals("PUT")) {
-			JSONParser parser = new JSONParser(); 
 			
-			try {
-				JSONObject json = (JSONObject) parser.parse(b);
-				Caixa caixa = new Caixa(Integer.parseInt(json.get("codigo").toString()),json.get("ip").toString(),Boolean.parseBoolean(json.get("acesso").toString()));
-				if(caixa.save(true)==1) {
-					 resTextAscii = CODE200;
+			if(params[0].startsWith("bloq-caixa")&&params[1].startsWith("caixa")) {
+				String codigoS = params[1].substring(params[1].indexOf('=')+1);
+				int codigo = Integer.parseInt(codigoS);
+				String acesso = params[0].substring(params[0].indexOf('=')+1);
+				Caixa caixa = new Caixa(codigo);
+				if(caixa.load()==1) {
+					caixa.setAcesso(Boolean.parseBoolean(acesso));
+					if(caixa.save(true)==1) {
+						 resTextAscii = CODE200; 
+					}
 				}
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
+			}else {
+				JSONParser parser = new JSONParser(); 
+				
+				try {
+					JSONObject json = (JSONObject) parser.parse(b);
+					Caixa caixa = new Caixa(Integer.parseInt(json.get("codigo").toString()),json.get("ip").toString(),Boolean.parseBoolean(json.get("acesso").toString()),json.get("auth").toString());
+					if(caixa.save(true)==1) {
+						 resTextAscii = CODE200; 
+					}
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			
+			
 		}
 		
 		
