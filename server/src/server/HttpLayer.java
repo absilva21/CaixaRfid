@@ -85,7 +85,7 @@ public class HttpLayer extends Thread {
 			if(rota[0].equals("/produto")) {
 				resTextAscii = produto(auxRota[0], params,reqS[reqS.length-1]);
 			}else if(rota[0].equals("/compra")) {
-				resTextAscii = compra(auxRota[0], params, reqS[reqS.length-1]);
+				resTextAscii = compra(auxRota[0], params, reqS[reqS.length-1],key);
 			}else if(rota[0].equals("/caixa")){
 				resTextAscii = caixa(auxRota[0], params, reqS[reqS.length-1]);
 			}else {
@@ -263,7 +263,7 @@ public class HttpLayer extends Thread {
 		return resTextAscii;
 	}
 	
-	public String compra(String method, String[] params,String b) {
+	public String compra(String method, String[] params,String b,String key) {
 		String resTextAscii = ERRO404;
 		
 		if(method.equals("GET")) {
@@ -277,9 +277,9 @@ public class HttpLayer extends Thread {
 					String body ="{\"codigo\":\""
 					+Integer.toString(compra.getCodigo())
 					+"\","
-					+"\"produtos\":[";
+					+"\"produtos\":[\"";
 					for(int i = 0;i<produtos.length;i++) {
-						body +=  produtos[i] +",";
+						body +=  produtos[i] +"\",";
 					}
 				 body += "],\"caixa\":\""
 				 +Integer.toString(compra.getCaixa())
@@ -292,6 +292,41 @@ public class HttpLayer extends Thread {
 							+body;
 				 
 				}
+			}else {
+				try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+					Statement statement = connection.createStatement();
+					ResultSet rs = statement.executeQuery("SELECT *  FROM compra");
+					String body = "{\"caixas\":[";
+					
+					while(rs.next()) {
+						body += "{\"codigo\":\"" 
+					          + rs.getString(1)
+					          + "\",\"caixa\":\""
+					          +rs.getString(2)
+						      +"\","
+						      +"\"produtos\":[";
+						Statement statementAux = connection.createStatement();
+						ResultSet rsAux = statementAux.executeQuery("SELECT produto FROM produto_compra WHERE compra = "
+								 + rs.getString(1));
+						while(rsAux.next()) {
+							body += "\"" 
+						            +rsAux.getString(1)
+									+"\",";
+						}
+						body += "]},";
+					}
+					body += "]}";
+					
+					resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: application/json; charset=utf-8\r\n"
+							+"Content-Length:"+ body.getBytes().length +"\r\n"
+							+ "\r\n"
+							+body;
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			
@@ -299,6 +334,7 @@ public class HttpLayer extends Thread {
 		}
 		
 		if(method.equals("POST")) {
+			int caixa = 0;
 			JSONParser parser = new JSONParser(); 
 			try {
 				JSONObject json = (JSONObject) parser.parse(b);
@@ -309,11 +345,36 @@ public class HttpLayer extends Thread {
 					produtos.add(p[i]);
 				}
 				
- 				int caixa = Integer.parseInt(json.get("caixa").toString());
-				Compra c = new Compra(produtos,caixa);
-				if(c.save(false)==1) {
-					resTextAscii = CODE200;
+				
+				try {
+					Class.forName("org.sqlite.JDBC");
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
+				
+				try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+					Statement statement = connection.createStatement();
+					String sql = "SELECT uc.caixa  FROM  usuario_caixa uc INNER JOIN usuario u ON "
+                            + "uc.usuario = u.codigo WHERE u.auth = \""
+                            +key.substring(key.indexOf(":")+2)
+                            +"\"";
+					ResultSet rs = statement.executeQuery(sql);
+					if(rs.next()) {
+						caixa = rs.getInt(1);
+						connection.close();
+						Compra c = new Compra(produtos,caixa);
+						if(c.save(false)==1) {
+							resTextAscii = CODE200;
+						}
+					}
+	 				
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -433,7 +494,7 @@ public class HttpLayer extends Thread {
 					if(tipo==1) {
 						result = true;
 					}else{
-						 rs = statement.executeQuery("SELECT acesso FROM usuario_caixa  WHERE caixa = "
+						 rs = statement.executeQuery("SELECT acesso FROM usuario_caixa  WHERE usuario = "
 							      +Integer.toString(codigo));
 						 if(rs.next()) {
 							 if(rs.getInt(1)==1) {
