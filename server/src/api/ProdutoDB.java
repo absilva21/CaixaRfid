@@ -3,6 +3,8 @@ package api;
 
 import java.sql.*;
 
+import server.HttpLayer;
+
 //representa a classe que vai carregar ou persistir os dados
 public class ProdutoDB implements IPersistente{
 	
@@ -24,7 +26,7 @@ public class ProdutoDB implements IPersistente{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		  try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		  try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			  System.out.println("Conexão realizada !!!!");
 			  Statement statement = connection.createStatement();
 			  
@@ -55,7 +57,7 @@ public class ProdutoDB implements IPersistente{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+			try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 				Statement statement = connection.createStatement();
 				statement.executeUpdate("UPDATE produto SET descricao =  "
 				+"\""
@@ -80,7 +82,7 @@ public class ProdutoDB implements IPersistente{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+			try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 				 System.out.println("Conexão realizada !!!!");
 				 Statement statement = connection.createStatement();
 				 statement.executeUpdate("INSERT INTO produto(codigo,descricao,preco,qtd) VALUES (\""
@@ -116,7 +118,7 @@ public class ProdutoDB implements IPersistente{
 			e1.printStackTrace();
 		}
 		
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			 System.out.println("Conexão realizada !!!!");
 			 Statement statement = connection.createStatement();
 			 statement.executeUpdate("DELETE FROM produto WHERE codigo = \""

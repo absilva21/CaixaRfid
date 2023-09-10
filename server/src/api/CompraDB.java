@@ -3,6 +3,8 @@ package api;
 import java.sql.*;
 import java.util.LinkedList;
 
+import server.HttpLayer;
+
 public class CompraDB implements IPersistente {
 	
 	private Compra compra;
@@ -32,7 +34,7 @@ public class CompraDB implements IPersistente {
 			e1.printStackTrace();
 		}
 		
-		 try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		 try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			 Statement statement = connection.createStatement();
 			 statement.executeUpdate("INSERT INTO compra(caixa) VALUES ("
 			 +Integer.toString(compra.getCaixa())
@@ -65,7 +67,7 @@ public class CompraDB implements IPersistente {
 			e1.printStackTrace();
 		}
 		
-		 try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		 try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			  System.out.println("Conexão realizada !!!!");
 			  
 			  Statement statement = connection.createStatement();

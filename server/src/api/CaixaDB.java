@@ -1,6 +1,7 @@
 package api;
 
 import java.sql.*;
+import server.HttpLayer;
 
 public class CaixaDB implements IPersistente {
 	
@@ -24,7 +25,7 @@ public class CaixaDB implements IPersistente {
 			e1.printStackTrace();
 		}
 		
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			Statement statement = connection.createStatement();
 			int acesso = 0;
 			
@@ -93,7 +94,7 @@ public class CaixaDB implements IPersistente {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT * FROM caixa WHERE codigo = "
 			+Integer.toString(caixa.getCodigo()));
@@ -134,7 +135,7 @@ public class CaixaDB implements IPersistente {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			Statement statement = connection.createStatement();
 			statement.executeUpdate("DELETE FROM caixa WHERE codigo = "
 			+Integer.toString(caixa.getCodigo()));

@@ -21,6 +21,9 @@ public class HttpLayer extends Thread {
 	
 	private String req;
 	private Socket socket;
+	
+	public static final String conn = "jdbc:sqlite:"+System.getProperty("user.dir")+"/dados.db";
+	
 	public static final String  ERRO404 = "HTTP/1.1 404 Not Found\r\n"
 			+ "Content-Type: text/html; charset=UTF-8\r\n"
 			+"Content-Length: 60 \r\n"
@@ -78,6 +81,8 @@ public class HttpLayer extends Thread {
 			params = new String[1];
 			params[0] = "";
 		}
+		
+		
 		
 		
 		if(auth(key)) {
@@ -165,7 +170,7 @@ public class HttpLayer extends Thread {
 					e1.printStackTrace();
 				}
 				
-				try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+				try (Connection connection = DriverManager.getConnection(conn)){
 					String body = "{\"caixas\":[";
 					Statement statement = connection.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT * FROM caixa");
@@ -293,7 +298,7 @@ public class HttpLayer extends Thread {
 				 
 				}
 			}else {
-				try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+				try (Connection connection = DriverManager.getConnection(conn)){
 					Statement statement = connection.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT *  FROM compra");
 					String body = "{\"caixas\":[";
@@ -353,7 +358,7 @@ public class HttpLayer extends Thread {
 					e1.printStackTrace();
 				}
 				
-				try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+				try (Connection connection = DriverManager.getConnection(conn)){
 					Statement statement = connection.createStatement();
 					String sql = "SELECT uc.caixa  FROM  usuario_caixa uc INNER JOIN usuario u ON "
                             + "uc.usuario = u.codigo WHERE u.auth = \""
@@ -480,7 +485,7 @@ public class HttpLayer extends Thread {
 				e1.printStackTrace();
 			}
 			
-			try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+			try (Connection connection = DriverManager.getConnection(conn)){
 				Statement statement = connection.createStatement();
 				ResultSet rs = statement.executeQuery("SELECT * FROM usuario  WHERE auth = \""
 					      +aux[1].substring(1)

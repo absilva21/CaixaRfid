@@ -1,6 +1,8 @@
 package api;
 import java.sql.*;
 
+import server.HttpLayer;
+
 public class UsuarioDB implements IPersistente {
 	
 	private Usuario usuario;
@@ -30,7 +32,7 @@ public class UsuarioDB implements IPersistente {
 			e1.printStackTrace();
 		}
 		
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			if(isUpdate) {
 				Statement statement = connection.createStatement();
 				statement.executeUpdate("UPDATE usuario SET auth = \" "
@@ -84,7 +86,7 @@ public class UsuarioDB implements IPersistente {
 			e1.printStackTrace();
 		}
 		
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT * FROM usuario WHERE codigo = "
 				      +Integer.toString(this.usuario.getCodigo()));
@@ -113,7 +115,7 @@ public class UsuarioDB implements IPersistente {
 			e1.printStackTrace();
 		}
 		
-		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.dir")+"\\src\\"+"dados.db")){
+		try (Connection connection = DriverManager.getConnection(HttpLayer.conn)){
 			Statement statement = connection.createStatement();
 			statement.execute("DELETE FROM usuario WHERE codigo = "
 			+Integer.toString(this.usuario.getCodigo()));
