@@ -11,10 +11,8 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
