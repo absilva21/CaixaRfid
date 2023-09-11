@@ -173,7 +173,7 @@ public class HttpLayer extends Thread {
 				try (Connection connection = DriverManager.getConnection(conn)){
 					String body = "{\"caixas\":[";
 					Statement statement = connection.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM caixa");
+					ResultSet rs = statement.executeQuery("SELECT c.codigo,c.ip,uc.acesso  FROM  caixa c INNER JOIN usuario_caixa uc ON c.codigo = uc.caixa ");
 					
 					while(rs.next()) {
 						body += "{\"codigo\":\""
@@ -181,7 +181,9 @@ public class HttpLayer extends Thread {
 								+"\","
 								+"\"ip\":\""
 								+rs.getString(2)
-								+"\"},";
+								+"\",\"acesso\":\""
+								+rs.getShort(3)
+								+ "\"},";
 					}
 					
 					body += "]}";
