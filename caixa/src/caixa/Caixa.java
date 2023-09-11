@@ -11,7 +11,10 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -36,7 +39,7 @@ public class Caixa {
 		String auth = "";
 		System.out.println("digite o ip do servidor\n");
 		ipSever = teclado.next();
-		System.out.println("digite bo ip do leitor\n");
+		System.out.println("digite o ip do leitor\n");
 		ipLeitor = teclado.next();
 		System.out.println("digite a chave do usuário\n");
 		auth = teclado.next();
@@ -52,6 +55,7 @@ public class Caixa {
 		
 		while(true) {
 			System.out.println("Digite um comando:\n");
+			System.out.println("l - para ler produtos\n");
 			comando = teclado.next();
 			
 			if(comando.equals("l")) {
@@ -103,7 +107,7 @@ public class Caixa {
 						
 						try {
 							JSONObject json = (JSONObject) parser.parse(response.body());
-							System.out.println("\ncodigo             descricão            valor\n");
+							System.out.println("\ncodigo                               descricão              valor\n");
 							System.out.println("\n"+json.get("codigo")+"             "+json.get("descricao")+"           R$"+ json.get("valor")+"\n");
 						} catch (ParseException e) {
 							// TODO Auto-generated catch block
@@ -114,6 +118,41 @@ public class Caixa {
 					}
 					else{
 						System.out.println("não foi possível consultar a base de dados");
+					}
+				}
+				
+				System.out.println("\n\n");
+				
+				System.out.println("deseja confirmar a compra ? 1- p/SIM 2-p/Não");
+				comando = teclado.next();
+				if(Integer.parseInt(comando)==1) {
+					String body = "";
+					for(int i = 0;i<produtos.length;i++) {
+						if(produtos.length-i==1) {
+							body += produtos[i];
+						}else {
+							body += produtos[i] + ",";
+						}
+					}
+					
+				
+					HttpClient client = HttpClient.newHttpClient();
+					HttpRequest request = HttpRequest.newBuilder()
+					          .uri(URI.create("http://"
+					          +ipSever
+					          +"/compra"))
+					          .header("Content-Type", "application/json; charset=utf-8")
+					          .header("auth", hash.toString(16))
+					          .POST(HttpRequest.BodyPublishers.ofString("{\"produtos\":\""+body+"\"}"))
+					          .build();
+					
+					HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+					if(response.statusCode()==200) {
+						System.out.println("\ncompra feita com sucesso");
+					}else if(response.statusCode()==401) {
+						System.out.println("Caixa bloqueado procure outro disponível");
+					}else {
+						System.out.println("erro na solicitação");
 					}
 				}
 				
