@@ -312,7 +312,8 @@ public class HttpLayer extends Thread {
 							+ "INNER JOIN "
 							+ "produto_compra pc ON c.codigo = pc.compra "
 							+ "WHERE p.codigo = pc.produto  AND c.caixa = "
-							+params[0].substring(params[0].indexOf('=')+1));
+							+params[0].substring(params[0].indexOf('=')+1)
+							+" ORDER BY c.codigo");
 					String body = "{\"compras\":[";
 					
 					while(rs.next()) {
