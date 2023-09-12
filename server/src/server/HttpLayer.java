@@ -299,6 +299,47 @@ public class HttpLayer extends Thread {
 							+body;
 				 
 				}
+			}else if(params[0].startsWith("caixa")) {
+				try (Connection connection = DriverManager.getConnection(conn)){
+					Statement statement = connection.createStatement();
+					ResultSet rs = statement.executeQuery("SELECT c.codigo,"
+							+ "p.codigo,"
+							+ "p.descricao,"
+							+ "p.preco  "
+							+ "FROM "
+							+ "produto p, "
+							+ "compra c  "
+							+ "INNER JOIN "
+							+ "produto_compra pc ON c.codigo = pc.compra "
+							+ "WHERE p.codigo = pc.produto  AND c.caixa = "
+							+params[0].substring(params[0].indexOf('=')+1));
+					String body = "{\"compras\":[";
+					
+					while(rs.next()) {
+						body += "{\"codigo\":\"" 
+					          + rs.getString(1)
+					          + "\",\"produto\":\""
+					          +rs.getString(2)
+						      +"\","
+						      +"\"descricao\":\""
+						      +rs.getString(3)
+						      +"\","
+						      +"\"preco\":\""
+						      +rs.getString(4)
+				              + "\"},";
+					}
+					body += "]}";
+					
+					resTextAscii = "HTTP/1.1 200 OK\r\n"
+							+ "Content-Type: application/json; charset=utf-8\r\n"
+							+"Content-Length:"+ body.getBytes().length +"\r\n"
+							+ "\r\n"
+							+body;
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}else {
 				try (Connection connection = DriverManager.getConnection(conn)){
 					Statement statement = connection.createStatement();

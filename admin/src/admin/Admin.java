@@ -64,6 +64,7 @@ public class Admin {
 					          .header("auth", hash.toString(16))
 					          .build();
 					try {
+						System.out.println("\nAcessando a base... \n");
 						HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
 						if(response.statusCode()==200) {
 							JSONParser parser = new JSONParser(); 
@@ -97,7 +98,7 @@ public class Admin {
 					
 					String caixa = teclado.next();
 					
-					System.out.println("\nDigite 1 - para liberar\n2 - bloquear:\n");
+					System.out.println("\nDigite 1 - para liberar\n2 - bloquear\nx - sair:\n");
 					
 					comando = teclado.next();
 					
@@ -132,7 +133,100 @@ public class Admin {
 			}
 			
 			if(comando.equals("2")) {
+				HttpClient client = HttpClient.newHttpClient();
+				HttpRequest request = HttpRequest.newBuilder()
+				          .GET()
+				          .timeout(Duration.ofSeconds(10))
+				          .uri(URI.create("http://"
+				          +ipSever
+				          +"/caixa"))
+				          .header("auth", hash.toString(16))
+				          .build();
+				try {
+					System.out.println("\nAcessando a base... \n");
+					HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
+					if(response.statusCode()==200) {
+						JSONParser parser = new JSONParser(); 
+						try {
+							JSONObject json = (JSONObject) parser.parse(response.body());
+							JSONArray caixas = (JSONArray) json.get("caixas");
+							Iterator i = caixas.iterator();
+							System.out.println("\ncodigo    ip    acesso\n");
+							while(i.hasNext()) {
+								JSONObject caixa = (JSONObject) i.next();
+								String codigo = (String) caixa.get("codigo"); 
+								String ip = (String) caixa.get("ip");
+								String acesso = (boolean) caixa.get("acesso").equals("1") ? "livre" : "bloqueado"; 
+								System.out.println("\n"+codigo+"    "+ip+"    "+acesso);
+							}
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
+				System.out.println("\nDigite o código do caixa:\n");
+				
+				String caixa = teclado.next();
+				
+			    client = HttpClient.newHttpClient();
+				request = HttpRequest.newBuilder()
+				          .GET()
+				          .timeout(Duration.ofSeconds(10))
+				          .uri(URI.create("http://"
+				          +ipSever
+				          +"/compra?caixa="
+				          +caixa))
+				          .header("auth", hash.toString(16))
+				          .build();
+				try {
+					System.out.println("\nAcessando a base... \n");
+					HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
+					if(response.statusCode()==200) {
+						JSONParser parser = new JSONParser();
+						JSONObject json = (JSONObject) parser.parse(response.body());
+						JSONArray compras = (JSONArray) json.get("compras");
+						Iterator i = compras.iterator();
+						String compraAtual = "";
+						String compra = "";
+						String produto = "";
+						String descricao = "";
+						String preco = "";
+						
+						while(i.hasNext()) {
+							
+							JSONObject comp = (JSONObject) i.next();
+							compra = (String) comp.get("codigo");
+							produto = (String) comp.get("produto");
+							descricao = (String) comp.get("descricao");
+							preco = (String) comp.get("preco");
+							
+							if(!compra.equals(compraAtual)) {
+								System.out.println("compra: "+compra);
+								System.out.println("produto                         descrição                 preço");
+							}
+							
+							System.out.println(produto+"        "+descricao+"        "+preco);
+							compraAtual = compra;
+						}
+					}
+				}catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
         	if(comando.equals("x")) {
