@@ -303,7 +303,7 @@ public class HttpLayer extends Thread {
 				try (Connection connection = DriverManager.getConnection(conn)){
 					Statement statement = connection.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT *  FROM compra");
-					String body = "{\"caixas\":[";
+					String body = "{\"compras\":[";
 					
 					while(rs.next()) {
 						body += "{\"codigo\":\"" 
