@@ -101,10 +101,10 @@ public class Admin {
 					
 					comando = teclado.next();
 					
-					String acesso = comando .equals("1") ? "1" : "0" ; 
+					String acesso = comando.equals("1") ? "true" : "false" ; 
 					
 					HttpRequest requestCaixa = HttpRequest.newBuilder()
-					          .GET()
+					          .PUT(HttpRequest.BodyPublishers.noBody())
 					          .timeout(Duration.ofSeconds(10))
 					          .uri(URI.create("http://"
 					          +ipSever
