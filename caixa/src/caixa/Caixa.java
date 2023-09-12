@@ -86,7 +86,7 @@ public class Caixa {
 				
 				String[] produtos = req.split("\n");
 				
-				
+				boolean status = false;
 				for(int i=0;i<produtos.length;i++) {
 					HttpClient client = HttpClient.newHttpClient();
 					HttpRequest request = HttpRequest.newBuilder()
@@ -107,12 +107,18 @@ public class Caixa {
 							JSONObject json = (JSONObject) parser.parse(response.body());
 							System.out.println("\ncodigo                               descricão              valor\n");
 							System.out.println("\n"+json.get("codigo")+"             "+json.get("descricao")+"           R$"+ json.get("valor")+"\n");
+							if(produtos.length-i==1) {
+								status = true;
+							}
 						} catch (ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
+						
 					}else if(response.statusCode()==401) {
 						System.out.println("Caixa bloqueado procure outro disponível");
+						break;
 					}
 					else{
 						System.out.println("não foi possível consultar a base de dados");
@@ -123,19 +129,19 @@ public class Caixa {
 				
 				System.out.println("deseja confirmar a compra ? 1- p/SIM 2-p/Não");
 				comando = teclado.next();
-				if(Integer.parseInt(comando)==1) {
+				if(Integer.parseInt(comando)==1&&status) {
 					String body = "";
-					for(int i = 0;i<produtos.length;i++) {
-						if(produtos.length-i==1) {
-							body += produtos[i];
+					for(int j = 0;j<produtos.length;j++) {
+						if(produtos.length-j==1) {
+							body += produtos[j];
 						}else {
-							body += produtos[i] + ",";
+							body += produtos[j] + ",";
 						}
 					}
 					
 				
-					HttpClient client = HttpClient.newHttpClient();
-					HttpRequest request = HttpRequest.newBuilder()
+					HttpClient clientCompra = HttpClient.newHttpClient();
+					HttpRequest requestCompra = HttpRequest.newBuilder()
 					          .uri(URI.create("http://"
 					          +ipSever
 					          +"/compra"))
@@ -144,15 +150,16 @@ public class Caixa {
 					          .POST(HttpRequest.BodyPublishers.ofString("{\"produtos\":\""+body+"\"}"))
 					          .build();
 					
-					HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-					if(response.statusCode()==200) {
+					HttpResponse<String> responseCompra = clientCompra.send(requestCompra, HttpResponse.BodyHandlers.ofString());
+					if(responseCompra.statusCode()==200) {
 						System.out.println("\ncompra feita com sucesso");
-					}else if(response.statusCode()==401) {
+					}else if(responseCompra.statusCode()==401) {
 						System.out.println("Caixa bloqueado procure outro disponível");
 					}else {
 						System.out.println("erro na solicitação");
 					}
 				}
+				
 				
 			}
 			
