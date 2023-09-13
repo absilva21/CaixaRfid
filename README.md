@@ -26,7 +26,7 @@ deve ser única na base, essa senha é criptografada por algoritmo de hash md5.
 "read" ele ler as tags, e ao responder ele envia os códigos das entiquetas dividindo a mensagem por linhas, cada linha uma tag.
 
 Toda a comunicação feita ao centro de dados em que se exige corpo na menssagem (PUT, POST), deve ser feita com envio por JSON
-EX:
+EX de POST:
 
 ```
 http://endereço/caixa
