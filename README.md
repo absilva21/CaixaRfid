@@ -34,15 +34,20 @@ http://endereço/caixa
 ```
 {"ip": "192.168.0.112",	"acesso": "1","auth":"a87ff679a2f3e71d9181a67b7542122c" }
 ```
+# Implatação
+A implatação é feita a partir de container docker, cada projeto tem o seu Dockerfile.
+O centro de dados foi implantado em uma VM ubuntu no Google Cloud.
 
 # IDE
 eclipse 2021-09
+
 # bibliotecas 
 json-simple-1.1.1
-
 sqlite-jdbc-3.6.14.1
+
 # vesão do java
 JDK 17.0.7
+
 # Data base 
 SQLITE3
 
