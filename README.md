@@ -25,7 +25,7 @@ deve ser única na base, essa senha é criptografada por algoritmo de hash md5.
   Uma observação a fazer é que o sensor tem um protocolo de comunicação específico onde ao receber uma String com a palavara
 "read" ele ler as tags, e ao responder ele envia os códigos das entiquetas dividindo a mensagem por linhas, cada linha uma tag.
 
-
+ Toda a comunicação feita ao centro de dados em que se exige corpo na menssagem (PUT, POST), deve ser feita com envio por JSON.
 
 
 # IDE
